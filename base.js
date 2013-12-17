@@ -12,10 +12,17 @@
 if (window.console == null) { window.console = {}; }
 if (window.console.log == null) { window.console.log = function() { }; }
 
+var enemy_attack_timer;
+var healthtimeout;
+var skilltimeout;
+var potiontimeout;
+var invulnerabilitydelay;
+
 function randomnumber(min,max) {
 	return Math.floor(Math.random()*(max-min)+min);
 }
 function closemessage() {
+	console.log('closing alert and modal messages');
 	$(".alert").fadeOut("fast");
 	$(".modal").fadeOut("fast");
 }
@@ -2141,6 +2148,9 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 		setTimeout(function(){console.log('makebattle closemessage timeout');closemessage();},2000);
 	}
 	else {
+		// this should have happened already, but just in case
+		stop_battle_timers();
+
 		if(poisoned) {
 			$(".player-"+id+"-hp").html(10);
 			myhealthpoint(true,10);
@@ -2150,7 +2160,7 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 		}
 		enemyhealthpoint(true,hp);
 		enemyhealthpoint2(true,hp);
-		setTimeout(function(){console.log('makebattle enemyattack timeout');enemyattack(id,damage);},2000+Math.random()*1000);
+		enemy_attack_timer = setTimeout(function(){console.log('makebattle enemyattack timeout');enemyattack(id,damage);},2000+Math.random()*1000);
 		theparam(true,param);
 		isinvuln(true,false);
 		battlestop(true,false);
@@ -2159,18 +2169,6 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 		theenemyascii(true,enemyascii);
 		theenemyname123(true,name);
 		$(".modal").fadeIn();
-		if(typeof attacktimeout !== 'undefined') {
-			clearTimeout(attacktimeout);
-		}
-		if(typeof healthtimeout !== 'undefined') {
-			clearTimeout(healthtimeout);
-		}
-		if(typeof skilltimeout !== 'undefined') {
-			clearTimeout(skilltimeout);
-		}
-		if(typeof invulnerabilitydelay !== 'undefined') {
-			clearTimeout(invulnerabilitydelay);
-		}
 		attackdelay(id,0);
 		healthdelay(id,0);
 		skilldelay(id,0);
@@ -2200,7 +2198,7 @@ function enemyattack(id,damage) {
 	else {
 		$(".button-health-"+id).attr("onclick","drinkhealthpotion("+id+","+myhealthpoint(false,0)+")");
 		if(myhealthpoint(false,0)<=0) {
-			battlestop(true,true);
+			battle_ended();
 			setTimeout(function(){console.log('enemyattack closemessage timeout');closemessage();},0);
 			//clearTiemout(asdasdf);
 		}
@@ -2211,8 +2209,10 @@ function enemyattack(id,damage) {
 					$(".enemy-"+id).animate({"margin-left":-160+"px"},200);
 					$(".enemy-sword-"+id).animate({"margin-left":-160+"px"},200);
 				}
-				setTimeout(function(){
-					console.log('I have no idea what this is');
+				enemy_attack_timer = setTimeout(function(){
+					// actually perform the attack
+					// this timer is set to coincide with the completion of the above animate() calls [200ms]
+					console.log('Performing enemy attack');
 					lagipusing=false;
 					if(isinvuln(false,0)==false) {
 						if(enemyconfused(false,0)) {
@@ -2233,10 +2233,6 @@ function enemyattack(id,damage) {
 					if(myhealthpoint(false,0)<=0) {
 						myhealthpoint(true,0)
 						myhp=myhealthpoint(false,0);
-						if (typeof asdasdf !== 'undefined') {
-							clearTimeout(asdasdf);
-							asdasdf = undefined;
-						}
 						enemyattack(id,damage,myhp);
 						if(!lagipusing) {
 							$(".enemy-"+id).animate({"margin-left":0+"px"},200);
@@ -2260,9 +2256,9 @@ function enemyattack(id,damage) {
 							$(".enemy-"+id+"-hp").html(hp);
 						}
 					}
+					// Schedule a new attack
+					enemy_attack_timer = setTimeout(function(){console.log('enemyattack enemyattack timeout');enemyattack(id,damage);},1800+Math.random()*1000);
 				},200);
-				myhp=myhealthpoint(false,0);
-				asdasdf=setTimeout(function(){console.log('enemyattack enemyattack timeout');enemyattack(id,damage);},2000+Math.random()*1000);
 			}
 		}
 		$(".button-health-"+id).attr("onclick","drinkhealthpotion("+id+","+myhealthpoint(false,0)+")");
@@ -2475,11 +2471,12 @@ function potiondelay(id,sec) {
 		$("[class^=button-potion-]").attr("disabled","disabled");
 		$(".potion-countdown-"+id).html("("+sec+" sec)");
 		sec--;
-		setTimeout(function(){console.log('potiondelay potiondelay timeout');potiondelay(id,sec);},1000);
+		potiontimeout = setTimeout(function(){console.log('potiondelay potiondelay timeout');potiondelay(id,sec);},1000);
 	}
 	else {
 		$("[class^=button-potion-]").removeAttr("disabled");
 		$(".potion-countdown-"+id).html("");
+		potiontimeout = undefined;
 	}
 }
 function skilldelay(id,sec) {
@@ -2492,6 +2489,7 @@ function skilldelay(id,sec) {
 	else {
 		$(".button-skill-"+id).removeAttr("disabled");
 		$(".button-skill-"+id).attr("value","Use skill");
+		skilltimeout = undefined;
 	}
 }
 function healthdelay(id,sec) {
@@ -2504,8 +2502,40 @@ function healthdelay(id,sec) {
 	else {
 		$(".button-health-"+id).removeAttr("disabled");
 		$(".button-health-"+id).attr("value","["+items[7].owned+"] Drink health potion");
+		healthtimeout = undefined;
 	}
 }
+
+// stop all of the background timers for the current battle
+function stop_battle_timers() {
+	// it is expected that the enemy is either attacking or preparing to attack; put a stop to that immediately.
+	if (typeof enemy_attack_timer !== 'undefined') { clearTimeout(enemy_attack_timer); enemy_attack_timer = undefined; }
+
+		if(typeof attacktimeout !== 'undefined') {
+			clearTimeout(attacktimeout);
+			attacktimeout = undefined;
+		}
+		if(typeof healthtimeout !== 'undefined') {
+			clearTimeout(healthtimeout);
+			healthtimeout = undefined;
+		}
+		if(typeof skilltimeout !== 'undefined') {
+			clearTimeout(skilltimeout);
+			skilltimeout = undefined;
+		}
+		if(typeof invulnerabilitydelay !== 'undefined') {
+			clearTimeout(invulnerabilitydelay);
+			invulnerabilitydelay = undefined;
+		}
+}
+
+// perform cleanup at the end of the battle, regardless of outcome
+function battle_ended() {
+	// signal to others that the battle has ended
+	battlestop(true, true);
+	stop_battle_timers();
+}
+
 function myhealthpoint(set,health) { if(!set) { return myhp; } else { myhp=health; } }
 function enemyhealthpoint(set,health) { if(!set) { return enemyhp; } else { enemyhp=health; } }
 function enemyhealthpoint2(set,health) { if(!set) { return enemyhp2; } else { enemyhp2=health; } }
@@ -2519,7 +2549,7 @@ function theenemyname123(set,enemyname) { if(!set) { return theenemyname; } else
 function winbattle(param,id) {
 	myfinalhp=myhealthpoint(false,0);
 	myhealthpoint(true,99999999999999999999);
-	battlestop(true,true);
+	battle_ended();
 	if(param=="vs-thief") {
 		passthief=true;
 		closemessage();
