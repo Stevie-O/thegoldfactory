@@ -2193,6 +2193,7 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 	}
 }
 function enemyattack(id,damage) {
+	console.log('enemyattack(' + id + ') for ' + damage);
 	if(id=="clear") {
 		//clearTiemout(asdasdf);
 	}
