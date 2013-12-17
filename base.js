@@ -9,6 +9,8 @@
 	(I want you to read this after finishing the game or things in this game may be spoiled to you)
 
 */
+if (window.console == null) { window.console = {}; }
+if (window.console.log == null) { window.console.log = function() { }; }
 
 function randomnumber(min,max) {
 	return Math.floor(Math.random()*(max-min)+min);
@@ -1159,7 +1161,7 @@ function enterportal(step,thehp2) {
 		}
 		else {
 			step++;
-			setTimeout(function(){enterportal(step,thehp2);},1000);
+			setTimeout(function(){console.log('enterportal timer');enterportal(step,thehp2);},1000);
 		}
 	}
 	else {
@@ -1403,6 +1405,7 @@ function vsinvisiblebot() {
 function entermagicportal() {
 	$(".fader").fadeIn("slow");
 	setTimeout(function() {
+		console.log('entermagicportal timeout');
 		$(".fader").fadeOut("slow");
 		$("#wrapper").hide();
 		$("#realworld").show();
@@ -1412,6 +1415,7 @@ function entermagicportal() {
 function exitmagicportal() {
 	$(".fader").fadeIn("slow");
 	setTimeout(function() {
+		console.log('exitmagicportal timeout');
 		$(".fader").fadeOut("slow");
 		$("#wrapper").show();
 		$("#realworld").hide();
@@ -2118,11 +2122,11 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 
 	if(hp<=0) {
 		//win
-		setTimeout(function(){winbattle(param,id);},2000);
+		setTimeout(function(){console.log('makebattle winbattle timeout');winbattle(param,id);},2000);
 	}
 	else if(myhp<=0) {
 		//lose
-		setTimeout(function(){closemessage();},2000);
+		setTimeout(function(){console.log('makebattle closemessage timeout');closemessage();},2000);
 	}
 	else {
 		if(poisoned) {
@@ -2134,7 +2138,7 @@ output="<table id=\"battle-"+id+"\">"+output2+"</table><br><div class=\"buttons-
 		}
 		enemyhealthpoint(true,hp);
 		enemyhealthpoint2(true,hp);
-		setTimeout(function(){enemyattack(id,damage);},2000+Math.random()*1000);
+		setTimeout(function(){console.log('makebattle enemyattack timeout');enemyattack(id,damage);},2000+Math.random()*1000);
 		healthpotion(id);
 		skillbutton(id);
 		potionsbutton(id);
@@ -2178,7 +2182,7 @@ function enemyattack(id,damage) {
 		$(".button-health-"+id).attr("onclick","drinkhealthpotion("+id+","+myhealthpoint(false,0)+")");
 		if(myhealthpoint(false,0)<=0) {
 			battlestop(true,true);
-			setTimeout(function(){closemessage();},0);
+			setTimeout(function(){console.log('enemyattack closemessage timeout');closemessage();},0);
 			//clearTiemout(asdasdf);
 		}
 		else {
@@ -2189,6 +2193,7 @@ function enemyattack(id,damage) {
 					$(".enemy-sword-"+id).animate({"margin-left":-160+"px"},200);
 				}
 				setTimeout(function(){
+					console.log('I have no idea what this is');
 					lagipusing=false;
 					if(isinvuln(false,0)==false) {
 						if(enemyconfused(false,0)) {
@@ -2234,7 +2239,7 @@ function enemyattack(id,damage) {
 					}
 				},200);
 				myhp=myhealthpoint(false,0);
-				asdasdf=setTimeout(function(){enemyattack(id,damage);},2000+Math.random()*1000);
+				asdasdf=setTimeout(function(){console.log('enemyattack enemyattack timeout');enemyattack(id,damage);},2000+Math.random()*1000);
 			}
 		}
 		$(".button-health-"+id).attr("onclick","drinkhealthpotion("+id+","+myhealthpoint(false,0)+")");
@@ -2247,7 +2252,7 @@ function attackenemy(id,power,hp,param) {
 	}
 	if(enemyhealthpoint(false,0)<=0) {
 		enemyattack("clear",0);
-		setTimeout(function(){winbattle(param,id);},0);
+		setTimeout(function(){console.log('attackenemy winbattle timeout');winbattle(param,id);},0);
 	}
 	else {
 		if(id>0) {
@@ -2265,6 +2270,7 @@ function attackenemy(id,power,hp,param) {
 			$(".player-"+id).animate({"margin-left":160+"px"},200);
 			$(".player-sword-"+id).animate({"margin-left":200+"px"},200);
 			setTimeout(function(){
+				console.log('attackenemy big timeout');
 				hp=enemyhealthpoint(false,0);
 				if(theenemyname123(false,0)=="Mr. Professor") {
 					power-=Math.round(power*5/100);
@@ -2296,7 +2302,7 @@ function attackdelay(id,sec) {
 		$(".button-attack-"+id).attr("disabled","disabled");
 		$(".button-attack-"+id).attr("value","Attack! ("+sec+")");
 		sec--;
-		attacktimeout=setTimeout(function(){attackdelay(id,sec);},1000);
+		attacktimeout=setTimeout(function(){console.log('attackdelay attackdelay timeout');attackdelay(id,sec);},1000);
 	}
 	else {
 		$(".button-attack-"+id).removeAttr("disabled");
@@ -2310,7 +2316,7 @@ function healthpotion(id) {
 	else {
 		$(".button-health-"+id).hide();
 	}
-	setTimeout(function(){healthpotion(id);},100);
+	setTimeout(function(){console.log('healthpotion healthpotion timeout');healthpotion(id);},100);
 }
 function skillbutton(id) {
 	if(skill!="none") {
@@ -2319,7 +2325,7 @@ function skillbutton(id) {
 	else {
 		$(".button-skill-"+id).hide();
 	}
-	setTimeout(function(){skillbutton(id);},100);
+	setTimeout(function(){console.log('skillbutton skillbutton timeout');skillbutton(id);},100);
 }
 function potionsbutton(id) {
 	for(i=11;i<=18;i++) {
@@ -2331,7 +2337,7 @@ function potionsbutton(id) {
 			$(".button-potion-"+i+"-"+id).hide();
 		}
 	}
-	setTimeout(function(){potionsbutton(id);},100);
+	setTimeout(function(){console.log('potionsbutton potionsbutotn timeout');potionsbutton(id);},100);
 }
 function drinkhealthpotion(id) {
 	if(items[7].owned!=0) {
@@ -2364,9 +2370,10 @@ function usetheskill(id) {
 			$(".thunder-"+id).css("opacity","1");
 			$(".alert").shake();
 			setTimeout(function() {
+				console.log('usetheskill thunder timeout');
 				$(".thunder-"+id).css("opacity","0");
 				if(enemyhealthpoint(false,0)<=0) {
-					setTimeout(function(){winbattle(theparam(false,0),id);},0);
+					setTimeout(function(){console.log('usetheskill thunder winbattle timeout');winbattle(theparam(false,0),id);},0);
 				}
 			},300);
 			skilldelay(id,mindelay);
@@ -2375,6 +2382,7 @@ function usetheskill(id) {
 			$(".player-"+id).css("opacity","0.5");
 			isinvuln(true,true);
 			invulnerabilitydelay=setTimeout(function() {
+				console.log('usetheskill invuln timeout');
 				$(".player-"+id).css("opacity","1");
 				isinvuln(true,false);
 			},(3+(skilllvl*3))*1000);
@@ -2400,7 +2408,7 @@ function usepotion(pid,id) {
 			enemyhealthpoint(true,hp);
 			$(".enemy-"+id+"-hp").html(hp);
 			if(enemyhealthpoint(false,0)<=0) {
-				setTimeout(function(){winbattle(theparam(false,0),id);},0);
+				setTimeout(function(){console.log('usepotion winbattle timeout');winbattle(theparam(false,0),id);},0);
 			}
 		}
 		else if(pid==13) {
@@ -2445,7 +2453,7 @@ function potiondelay(id,sec) {
 		$("[class^=button-potion-]").attr("disabled","disabled");
 		$(".potion-countdown-"+id).html("("+sec+" sec)");
 		sec--;
-		setTimeout(function(){potiondelay(id,sec);},1000);
+		setTimeout(function(){console.log('potiondelay potiondelay timeout');potiondelay(id,sec);},1000);
 	}
 	else {
 		$("[class^=button-potion-]").removeAttr("disabled");
@@ -2457,7 +2465,7 @@ function skilldelay(id,sec) {
 		$(".button-skill-"+id).attr("disabled","disabled");
 		$(".button-skill-"+id).attr("value","Use skill ("+sec+")");
 		sec--;
-		skilltimeout=setTimeout(function(){skilldelay(id,sec);},1000);
+		skilltimeout=setTimeout(function(){console.log('skilldelay skilldelay timeout');skilldelay(id,sec);},1000);
 	}
 	else {
 		$(".button-skill-"+id).removeAttr("disabled");
@@ -2469,7 +2477,7 @@ function healthdelay(id,sec) {
 		$(".button-health-"+id).attr("disabled","disabled");
 		$(".button-health-"+id).attr("value","["+items[7].owned+"] Drink health potion ("+sec+")");
 		sec--;
-		healthtimeout=setTimeout(function(){healthdelay(id,sec);},1000);
+		healthtimeout=setTimeout(function(){console.log('healthdelay healthdelay timeout');healthdelay(id,sec);},1000);
 	}
 	else {
 		$(".button-health-"+id).removeAttr("disabled");
@@ -2535,6 +2543,7 @@ chest='\n\
 	else if(param=="vs-castle-guard"){
 		$(".buttons-"+id).hide();
 		setTimeout(function(){
+			console.log('vs-castle-guard closemessage timeout');
 			closemessage();
 			castlegotohall(myfinalhp);
 		},2000);
@@ -2542,6 +2551,7 @@ chest='\n\
 	else if(param=="vs-castle-staff"){
 		$(".buttons-"+id).hide();
 		setTimeout(function(){
+			console.log('vs-castle-staff closemessage timeout');
 			closemessage();
 			castlegotoking(myfinalhp);
 		},2000);
@@ -2599,6 +2609,7 @@ scroll='\n\
 		$(".buttons-"+id).hide();
 		$(".enemy-"+id+"-hp").html('1');
 		setTimeout(function(){
+			console.log('vs-boss insane timeout');			
 			makealert("boss-win","Almost!","<marquee direction=\"up\" scrollamount=\"2\" scrolldelay=\"1\" onmouseover=\"this.stop()\" onmouseout=\"this.start();\" behavior=\"slide\">You (almost) killed the guy<br>but he successfully recover 1 hp before dying<br><br><br><br><br><br>But....<br><br><br><br>You have learned something.......<br><br><br><br><br><br><br><br>You can't solve a problem by doing a revenge......<br><br><br><br><br><br><br><br>The best way is to talk to the guy himself and forgive him......<br><br><br><br><br><br><br><br>Since killing won't solve the problem......<br><br><br><br><br><br><br><br>You have talked to him and forgive him<br><br><br><br>Everything is normal now<br><br><br><br>And now he wants you to teleport back to the real world.............<br><br><br><br>But, you finally choose to live in this 'weird' world<br><br><br><br>You have done so many things in this world<br><br><br><br>and you learned to love this world<br><br><br><br>and you don't even want to go back<br><br><br><br><br><br><br><br>Oh, btw he has a chest for you<br><br><br><br><input type='button' onclick='chest()' value='Open the chest'><br><br></marquee>",true);
 			$(".button-close-window-boss-win").hide();
 		},2000);
